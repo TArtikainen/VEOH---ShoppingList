@@ -50,7 +50,7 @@ app.get('/shoppinglist/:id', is_logged_handler, shoppinglist_controller.get_shop
 app.post('/add-product/:id', is_logged_handler, shoppinglist_controller.post_add_product);
 app.post('/add-shoppinglist', is_logged_handler, shoppinglist_controller.post_add_shoppinglist);
 app.post('/delete-shoppinglist', is_logged_handler, shoppinglist_controller.post_delete_shoppinglist);
-
+app.post('/shoppinglist/delete-product', is_logged_handler, shoppinglist_controller.post_delete_product);
 
 app.use((req, res, next) => {
     res.status(404);

@@ -1,80 +1,137 @@
 const shoppinglists_view = ((data) => {
     let html = `
+        <!DOCTYPE html>
         <html>
 
-        <body>
-        <h1>Shopping list application</h1>
-        <br>
-        <h2>Shopping lists:</h2>
+        <head>
+        <meta http-equiv="Content-Type", content="text/html;charset=UTF-8">
+        <link rel="stylesheet" type="text/css" href="../css/style.css">
+        </head> 
 
-        Shoppinglists for user: ${data.user_name}<br>
+        <body>
+        <div class="shoppinglist-header1">
+            <div><h1>ShoppingList App</h1></div>
+            <div><h2>Shoppinglists for user: ${data.user_name}</h2></div>
+            <div>
+            <form action="/logout" method="POST">
+            <button class=button2 type="submit">Log out</button>
+            </form>
+            </div>
+        </div>
+
+        <div class="shoppinglist-header2">
+        <div>         
+        <form action="/add-shoppinglist" method="POST">
+            <input class=input2 type="text" placeholder="Enter shoplist name" name="shoppinglist">
+            <button class=button1 type="submit">Add a shoppinglist</button><br>
+        </form>
+    </div>
+    </div>
+    </div>
         
+
+        <div class="title">
+            Lists
+        </div>
             `;
        
         data.shoppinglists.forEach((shoppinglist) => {                        
             html += `
-                <a href="/shoppinglist/${shoppinglist._id}">${shoppinglist.name}</a>               
+            
+            <div class="shoppinglist-listview" >
+            <div class="shoppinglist-listtitle">
+                <div><b>List name</b></div>
+                <div><b>Delete list</b></div>
+            </div> 
+            <div>
+                <h2><a href="/shoppinglist/${shoppinglist._id}">${shoppinglist.name}</a></h2>
+            </div>
+            <div>
                 <form action="delete-shoppinglist" method="POST">
                     <input type="hidden" name="shoppinglist_id" value="${shoppinglist._id}">
-                    <button type="submit">Delete list</button>
+                    <button class=button4 type="submit">X</button>
                 </form>
+                </div>
+            </div>
+            </div>
+            
             `;
         });
 
-        html += `
-            <form action="/add-shoppinglist" method="POST">
-                <input type="text" name="shoppinglist">
-                <button type="submit">Add a shoppinglist</button>
-            </form>
-
-            <form action="/logout" method="POST">
-                <button type="submit">Log out</button>
-            </form>
-        </body>
-        </html>
-        `;
     return html;
 });
 
 const shoppinglist_view = ((data) => {
     let html = `
+        <!DOCTYPE html>
         <html>
+        <head>
         
+        <meta http-equiv="Content-Type", content="text/html;charset=UTF-8">
+        <link rel="stylesheet" type="text/css" href="../css/style.css">
+        </head>
         <body>
-                ShoppingList App
-            <h3><a href="/">Back to shoppinglists</a></h3>
-            
+        <div class="shoppinglist-header1">
+            <div><h1>ShoppingList App</h1></div>
+            <div><h2>Shoppinglist name: ${data.shoppinglist_name}</h2></div>
+            <div>
+            <form action="/">
+            <button class=button2 type="submit">Back to shoppinglists</button>
             </form>
-            <h1>Shoppinglist: ${data.shoppinglist_name}</h1>
-            <h2>products:</h2>
-            <table>
-                       
+            </div>
+        </div>
+        
+        
+        <div class="shoppinglist-header2">
+            <form action="/add-product/${data.shoppinglist_id}" method="POST">
+            <input class=input3 type="text" placeholder = "Enter product name" name="product_name" >
+            <input class=input4 type="number" placeholder = "Enter quantity" name="product_quantity">
+            <input class=input5 type="text" placeholder = "Enter image url" name="product_image_url">
+            <button class=button3 type="submit">Add product</button>
+            </form>
+        </div>
+        
+        </div>
+        
+        <br>           
+        <div class="title">
+            Products
+        </div>
     `;
 
 
     data.products.forEach((product) => { 
-        html += `                    
-        <p>
-        <h3>Name: ${product.name}<br></h3>
-        <img src="${product.img}" width="100px" heigth="100px" /><br>
-        Quantity: ${product.quantity}
-        </p>
-                               
-                                 
+        html += `
+
+        
+        <div class="shoppinglist-productview">
+            <div class="shoppinglist-producttitle">
+                <div><b>Product name</b></div>
+                <div><b>Quantity</b></div>
+                <div><b>Image</b></div>
+                <div><b>Delete product</b>
+            </div>
+
+            </div>                    
+                    <div><h3> ${product.name}</h3></div>
+                    <div><h3> ${product.quantity}</h3></div>
+                    
+                    <div><img src="${product.image_url}" width=150px heigth=150px alt="Image"></div>
+                    
+                    <div>
+                    <form action="/shoppinglist/delete-product" method="POST">
+                        <input type="hidden" name="product_id" value="${product._id}">
+                        <input type="hidden" name="shoppinglist_id" value="${data.shoppinglist_id}">
+                        <button class=button4 type="submit">X</button>
+                    </form>
+            </div>
+                    
+                
+        </div>                    
+        </body>
         `;                                                
     });        
 
-    html += `
-            </table>
-            <form action="/add-product/${data.shoppinglist_id}" method="POST">
-            Product name:<br><input type="text" name="product_name" ><br><br>
-            Quantity:<br><input type="number" name="product_quantity"><br><br>
-            Image url:<br><input type="text" name="product_image_url"><br><br>
-            <button type="submit">Add product</button>
-            </form>
-        </body>
-        </html>
-    `;
     return html;
 });
 

@@ -15,8 +15,6 @@ const get_shoppinglists = (req, res, next) => {
     });
 };
 
-
-
 const get_shoppinglist = (req, res, next) => {
     const shoppinglist_id = req.params.id;
     shoppinglist_model.findOne({
@@ -30,27 +28,6 @@ const get_shoppinglist = (req, res, next) => {
             };
             let html = shoppinglist_views.shoppinglist_view(data);
             res.send(html);
-        });
-    });
-};
-
-const post_add_product = (req, res, next) => {
-    const shoppinglist_id = req.params.id;
-    shoppinglist_model.findOne({
-        _id: shoppinglist_id
-    }).then((shoppinglist) => {
-        
-        let new_product = product_model({
-            name: req.body.product_name,
-            quantity: req.body.product_quantity,
-            img: req.body.product_image_url
-        });
-
-        new_product.save().then(() => {
-            shoppinglist.products.push(new_product);
-            shoppinglist.save().then(() => {
-                return res.redirect(`/shoppinglist/${shoppinglist._id}`);
-            });
         });
     });
 };
@@ -81,15 +58,58 @@ const post_delete_shoppinglist = (req, res, next) => {
     user.ShoppingLists = updated_shoppinglist;
 
     user.save().then(() => {
-        shoppinglist_model.findById(shoppinglist_id_to_delete).then(() => {
+        
+        shoppinglist_model.findById(shoppinglist_id_to_delete).then((shoppinglist) => {
+            shoppinglist.populate('products').execPopulate().then(() => {
+                shoppinglist.products.forEach((product) => {
+                product_model.findByIdAndDelete(product._id).then(() => {
+                console.log('Shoppinglist products deleted');
+                    });
+                });
+            });
+        });
+
+        shoppinglist_model.findByIdAndDelete(shoppinglist_id_to_delete).then(() => {
             res.redirect('/');
         });
     });
 };
 
+const post_add_product = (req, res, next) => {
+    const shoppinglist_id = req.params.id;
+    shoppinglist_model.findOne({
+        _id: shoppinglist_id
+    }).then((shoppinglist) => {
+        
+        let new_product = product_model({
+            name: req.body.product_name,
+            quantity: req.body.product_quantity,
+            image_url: req.body.product_image_url
+        });
+
+        new_product.save().then(() => {
+            shoppinglist.products.push(new_product);
+            shoppinglist.save().then(() => {
+                return res.redirect(`/shoppinglist/${shoppinglist._id}`);
+            });
+        });
+    });
+};
+
+const post_delete_product = (req, res, next) => {
+    const user = req.user;
+    const product_id_to_delete = req.body.product_id;
+    const shoppinglist_id = req.body.shoppinglist_id;
+
+    product_model.findByIdAndDelete(product_id_to_delete).then(() => {
+        res.redirect(`/shoppinglist/${shoppinglist_id}`);
+    });
+
+};
 
 module.exports.get_shoppinglists = get_shoppinglists;
 module.exports.get_shoppinglist = get_shoppinglist;
 module.exports.post_add_product = post_add_product;
 module.exports.post_add_shoppinglist = post_add_shoppinglist;
 module.exports.post_delete_shoppinglist = post_delete_shoppinglist;
+module.exports.post_delete_product = post_delete_product;
