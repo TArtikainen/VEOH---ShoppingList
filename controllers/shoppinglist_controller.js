@@ -51,14 +51,12 @@ const post_add_shoppinglist = (req, res, next) => {
 const post_delete_shoppinglist = (req, res, next) => {
     const user = req.user;
     const shoppinglist_id_to_delete = req.body.shoppinglist_id;
-
     const updated_shoppinglist = user.ShoppingLists.filter((shoppinglist_id) => {
         return shoppinglist_id != shoppinglist_id_to_delete;
     });
     user.ShoppingLists = updated_shoppinglist;
 
     user.save().then(() => {
-        
         shoppinglist_model.findById(shoppinglist_id_to_delete).then((shoppinglist) => {
             shoppinglist.populate('products').execPopulate().then(() => {
                 shoppinglist.products.forEach((product) => {
